@@ -2,7 +2,8 @@
 // kontrol_configuration migration, which seeds the database copy that the
 // Settings page edits. Keep the two in step.
 
-export const kontrolTitle = "Kontrolai CRM";
+// Shown beside the KONTROL[ai] wordmark; the browser tab and PWA name say "Kontrolai CRM"
+export const kontrolTitle = "CRM";
 
 export const kontrolCurrency = "AUD";
 
