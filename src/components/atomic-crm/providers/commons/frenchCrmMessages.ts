@@ -191,6 +191,8 @@ export const frenchCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Date de clôture prévue",
         stage: "Étape",
+        referral_source: "Source de recommandation",
+        referral_partner: "Partenaire de recommandation",
       },
       action: {
         back_to_deal: "Retour à l'affaire",

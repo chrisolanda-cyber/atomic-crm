@@ -76,7 +76,9 @@ create table public.deals (
     archived_at timestamp with time zone,
     expected_closing_date date,
     sales_id bigint,
-    index smallint
+    index smallint,
+    referral_source text,
+    referral_partner text
 );
 
 create table public.deal_notes (

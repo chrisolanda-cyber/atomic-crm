@@ -187,6 +187,8 @@ export const englishCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Expected closing date",
         stage: "Stage",
+        referral_source: "Referral source",
+        referral_partner: "Referral partner",
       },
       action: {
         back_to_deal: "Back to deal",

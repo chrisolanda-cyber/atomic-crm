@@ -128,6 +128,8 @@ export type Deal = {
   expected_closing_date: string;
   sales_id: Identifier;
   index: number;
+  referral_source?: string | null;
+  referral_partner?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type DealNote = {

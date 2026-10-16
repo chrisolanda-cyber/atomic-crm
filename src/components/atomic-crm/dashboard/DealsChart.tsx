@@ -8,12 +8,14 @@ import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 
-const multiplier = {
+const multiplier: Record<string, number> = {
   opportunity: 0.2,
   "proposal-sent": 0.5,
   "in-negociation": 0.8,
   delayed: 0.3,
 };
+// Applied to open deals in custom stages that have no explicit multiplier
+const DEFAULT_MULTIPLIER = 0.5;
 
 const threeMonthsAgo = new Date(
   new Date().setMonth(new Date().getMonth() - 6),
@@ -23,7 +25,9 @@ const DEFAULT_LOCALE = "en-US";
 
 export const DealsChart = memo(() => {
   const translate = useTranslate();
-  const { dealStages, currency } = useConfigurationContext();
+  const { dealStages, dealPipelineStatuses, currency } =
+    useConfigurationContext();
+  const isWon = (deal: Deal) => dealPipelineStatuses.includes(deal.stage);
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
     : [DEFAULT_LOCALE];
@@ -55,16 +59,15 @@ export const DealsChart = memo(() => {
       return {
         date: format(month, "MMM"),
         won: dealsByMonth[month]
-          .filter((deal: Deal) => deal.stage === "won")
+          .filter(isWon)
           .reduce((acc: number, deal: Deal) => {
             acc += deal.amount;
             return acc;
           }, 0),
         pending: dealsByMonth[month]
-          .filter((deal: Deal) => !["won", "lost"].includes(deal.stage))
+          .filter((deal: Deal) => !isWon(deal) && deal.stage !== "lost")
           .reduce((acc: number, deal: Deal) => {
-            // @ts-expect-error - multiplier type issue
-            acc += deal.amount * multiplier[deal.stage];
+            acc += deal.amount * (multiplier[deal.stage] ?? DEFAULT_MULTIPLIER);
             return acc;
           }, 0),
         lost: dealsByMonth[month]
@@ -77,7 +80,8 @@ export const DealsChart = memo(() => {
     });
 
     return amountByMonth;
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, dealPipelineStatuses]);
 
   if (isPending) return null; // FIXME return skeleton instead
   const range = months.reduce(

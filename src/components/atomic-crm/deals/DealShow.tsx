@@ -139,6 +139,24 @@ const DealShowContent = () => {
                 {findDealLabel(dealStages, record.stage)}
               </span>
             </div>
+
+            {record.referral_source && (
+              <div className="flex flex-col mr-10">
+                <span className="text-xs text-muted-foreground tracking-wide">
+                  {translate("resources.deals.fields.referral_source")}
+                </span>
+                <span className="text-sm">{record.referral_source}</span>
+              </div>
+            )}
+
+            {record.referral_partner && (
+              <div className="flex flex-col mr-10">
+                <span className="text-xs text-muted-foreground tracking-wide">
+                  {translate("resources.deals.fields.referral_partner")}
+                </span>
+                <span className="text-sm">{record.referral_partner}</span>
+              </div>
+            )}
           </div>
 
           {!!record.contact_ids?.length && (

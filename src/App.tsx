@@ -1,4 +1,12 @@
 import { CRM } from "@/components/atomic-crm/root/CRM";
+import {
+  kontrolCurrency,
+  kontrolDealCategories,
+  kontrolDealPipelineStatuses,
+  kontrolDealStages,
+  kontrolTaskTypes,
+  kontrolTitle,
+} from "./kontrolConfiguration";
 
 /**
  * Application entry point
@@ -31,6 +39,15 @@ import { CRM } from "@/components/atomic-crm/root/CRM";
  *    />
  * );
  */
-const App = () => <CRM />;
+const App = () => (
+  <CRM
+    title={kontrolTitle}
+    currency={kontrolCurrency}
+    dealStages={kontrolDealStages}
+    dealPipelineStatuses={kontrolDealPipelineStatuses}
+    dealCategories={kontrolDealCategories}
+    taskTypes={kontrolTaskTypes}
+  />
+);
 
 export default App;

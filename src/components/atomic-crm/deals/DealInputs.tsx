@@ -96,10 +96,15 @@ const DealMiscInputs = () => {
         choices={dealStages}
         optionText="label"
         optionValue="value"
-        defaultValue="opportunity"
+        defaultValue={dealStages[0]?.value}
         helperText={false}
         validate={required()}
       />
+      <TextInput
+        source="referral_source"
+        helperText="e.g. Website, Event, Referral partner, Existing client"
+      />
+      <TextInput source="referral_partner" helperText={false} />
     </div>
   );
 };
