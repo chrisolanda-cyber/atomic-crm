@@ -4,6 +4,7 @@ import {
   kontrolDealCategories,
   kontrolDealPipelineStatuses,
   kontrolDealStages,
+  kontrolNoteStatuses,
   kontrolTaskTypes,
   kontrolTitle,
 } from "./kontrolConfiguration";
@@ -47,6 +48,7 @@ const App = () => (
     dealPipelineStatuses={kontrolDealPipelineStatuses}
     dealCategories={kontrolDealCategories}
     taskTypes={kontrolTaskTypes}
+    noteStatuses={kontrolNoteStatuses}
   />
 );
 

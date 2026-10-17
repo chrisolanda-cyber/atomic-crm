@@ -3,11 +3,10 @@ import { Link } from "react-router";
 
 import type { Contact, Tag } from "../types";
 
-// Outreach status lives in tags named "Status: <status>" (set by the outreach
-// import); every other tag is treated as a campaign.
-const STATUS_PREFIX = "Status: ";
-const NOT_YET_CONTACTED = ["Not contacted", "Not researched"];
-const TALKING = ["In conversation", "Review booked", "Proposal sent"];
+// Every tag is a campaign; outreach progress comes from the contact's Status
+// (values from kontrolNoteStatuses).
+const NOT_YET_CONTACTED = ["not-contacted", "not-researched"];
+const TALKING = ["in-conversation", "review-booked", "proposal-sent"];
 
 type CampaignRow = {
   tag: Tag;
@@ -37,29 +36,22 @@ export const CampaignProgress = () => {
 
   if (isPendingTags || isPendingContacts) return null;
 
-  const statusOf = new Map(
-    tags
-      .filter((tag) => tag.name.startsWith(STATUS_PREFIX))
-      .map((tag) => [tag.id, tag.name.slice(STATUS_PREFIX.length)]),
-  );
-  const contactStatus = (contact: Contact) =>
-    contact.tags?.map((id) => statusOf.get(id)).find(Boolean);
-
   const rows: CampaignRow[] = tags
-    .filter((tag) => !tag.name.startsWith(STATUS_PREFIX))
     .map((tag) => {
       const members = contacts.filter((contact) =>
         contact.tags?.includes(tag.id),
       );
-      const statuses = members.map(contactStatus);
       return {
         tag,
         total: members.length,
-        contacted: statuses.filter(
-          (status) => status != null && !NOT_YET_CONTACTED.includes(status),
+        contacted: members.filter(
+          (contact) =>
+            contact.status != null &&
+            !NOT_YET_CONTACTED.includes(contact.status),
         ).length,
-        talking: statuses.filter(
-          (status) => status != null && TALKING.includes(status),
+        talking: members.filter(
+          (contact) =>
+            contact.status != null && TALKING.includes(contact.status),
         ).length,
       };
     })
