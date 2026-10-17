@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useGetList } from "ra-core";
 import { Link } from "react-router";
 
 import type { Contact, Tag } from "../types";
 
-// Every tag is a campaign; outreach progress comes from the contact's Status
-// (values from kontrolNoteStatuses).
+// Tags come in three families named "<Family>: <value>". Outreach progress
+// comes from the contact's Status (values from kontrolNoteStatuses).
+const FAMILIES = ["Type", "Area", "Source"] as const;
+type Family = (typeof FAMILIES)[number];
 const NOT_YET_CONTACTED = ["not-contacted"];
 const TALKING = ["in-conversation", "review-booked", "proposal-sent"];
 
@@ -21,10 +24,11 @@ const contactsWithTagLink = (tagId: Tag["id"]) =>
   )}`;
 
 /**
- * One row per campaign tag: how much of the list has been worked, and how many
- * contacts are now in a real conversation.
+ * One row per tag in the chosen family (Type, Area or Source): how much of the
+ * group has been worked, and how many contacts are now in a real conversation.
  */
 export const CampaignProgress = () => {
+  const [family, setFamily] = useState<Family>("Type");
   const { data: tags = [], isPending: isPendingTags } = useGetList<Tag>(
     "tags",
     { pagination: { page: 1, perPage: 500 } },
@@ -36,7 +40,9 @@ export const CampaignProgress = () => {
 
   if (isPendingTags || isPendingContacts) return null;
 
+  const prefix = `${family}: `;
   const rows: CampaignRow[] = tags
+    .filter((tag) => tag.name.startsWith(prefix))
     .map((tag) => {
       const members = contacts.filter((contact) =>
         contact.tags?.includes(tag.id),
@@ -58,20 +64,47 @@ export const CampaignProgress = () => {
     .filter((row) => row.total > 0)
     .sort((a, b) => b.total - a.total);
 
-  if (rows.length === 0) return null;
-
   return (
     <section aria-labelledby="campaigns-heading">
-      <h2
-        id="campaigns-heading"
-        className="font-condensed text-xl font-semibold tracking-tight"
-      >
-        Outreach by campaign
-      </h2>
-      <p className="text-sm text-muted-foreground mt-1 mb-4">
-        Bar shows how much of each list you have contacted. Darker teal is
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2
+          id="campaigns-heading"
+          className="font-condensed text-xl font-semibold tracking-tight"
+        >
+          Outreach progress
+        </h2>
+        <div
+          role="group"
+          aria-label="Group outreach progress by"
+          className="flex rounded-md border p-0.5 text-sm"
+        >
+          {FAMILIES.map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={family === option}
+              onClick={() => setFamily(option)}
+              className={
+                "rounded-sm px-2.5 py-1 focus-visible:outline-2 focus-visible:outline-ring " +
+                (family === option
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground mt-2 mb-4">
+        Bar shows how much of each group you have contacted. Darker teal is
         contacts you are talking to.
       </p>
+      {rows.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No contacts have a {family.toLowerCase()} tag yet.
+        </p>
+      )}
       <ul className="flex flex-col divide-y">
         {rows.map(({ tag, total, contacted, talking }) => (
           <li key={tag.id} className="py-2.5">
@@ -81,7 +114,7 @@ export const CampaignProgress = () => {
             >
               <div className="flex items-baseline justify-between gap-4">
                 <span className="font-medium leading-snug group-hover:text-primary">
-                  {tag.name}
+                  {tag.name.slice(prefix.length)}
                 </span>
                 <span className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
                   {contacted} of {total}
