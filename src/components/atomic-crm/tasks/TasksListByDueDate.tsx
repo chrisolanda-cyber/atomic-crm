@@ -54,35 +54,47 @@ export const TasksListByDueDate = ({
     [tasks],
   );
 
+  // Tasks without a due date get their own group: new Date(null) is 1970,
+  // which would otherwise file every undated task under "Overdue".
+  const datedTasks = useMemo(
+    () => ongoingTasks.filter((task) => task.due_date != null),
+    [ongoingTasks],
+  );
+
+  const noDateTasks = useMemo(
+    () => ongoingTasks.filter((task) => task.due_date == null),
+    [ongoingTasks],
+  );
+
   const overdueTasks = useMemo(
     () =>
-      ongoingTasks?.filter((task) => {
+      datedTasks?.filter((task) => {
         return isOverdue(task.due_date);
       }) || [],
-    [ongoingTasks],
+    [datedTasks],
   );
 
   const dueTodayTasks = useMemo(
     () =>
-      ongoingTasks?.filter((task) => {
+      datedTasks?.filter((task) => {
         return isDueToday(task.due_date);
       }) || [],
-    [ongoingTasks],
+    [datedTasks],
   );
 
   const dueTomorrowTasks = useMemo(
-    () => ongoingTasks?.filter((task) => isDueTomorrow(task.due_date)) || [],
-    [ongoingTasks],
+    () => datedTasks?.filter((task) => isDueTomorrow(task.due_date)) || [],
+    [datedTasks],
   );
 
   const dueThisWeekTasks = useMemo(
-    () => ongoingTasks?.filter((task) => isDueThisWeek(task.due_date)) || [],
-    [ongoingTasks],
+    () => datedTasks?.filter((task) => isDueThisWeek(task.due_date)) || [],
+    [datedTasks],
   );
 
   const dueLaterTasks = useMemo(
-    () => ongoingTasks?.filter((task) => isDueLater(task.due_date)) || [],
-    [ongoingTasks],
+    () => datedTasks?.filter((task) => isDueLater(task.due_date)) || [],
+    [datedTasks],
   );
 
   const oneSecondHasPassed = useTimeout(1000);
@@ -130,6 +142,12 @@ export const TasksListByDueDate = ({
       <TaskListFilter
         tasks={dueLaterTasks}
         title={translate("resources.tasks.filters.later")}
+        showContact={showContact}
+        isMobile={isMobile}
+      />
+      <TaskListFilter
+        tasks={noDateTasks}
+        title={translate("resources.tasks.filters.no_date", { _: "No date" })}
         showContact={showContact}
         isMobile={isMobile}
       />

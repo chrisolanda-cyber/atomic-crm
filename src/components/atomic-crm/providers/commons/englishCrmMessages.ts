@@ -339,6 +339,7 @@ export const englishCrmMessages = {
       filters: {
         later: "Later",
         overdue: "Overdue",
+        no_date: "No date",
         this_week: "This week",
         today: "Today",
         tomorrow: "Tomorrow",

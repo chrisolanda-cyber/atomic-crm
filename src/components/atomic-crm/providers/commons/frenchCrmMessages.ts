@@ -344,6 +344,7 @@ export const frenchCrmMessages = {
       filters: {
         later: "Plus tard",
         overdue: "En retard",
+        no_date: "Sans date",
         this_week: "Cette semaine",
         today: "Aujourd'hui",
         tomorrow: "Demain",
