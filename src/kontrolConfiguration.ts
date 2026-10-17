@@ -41,7 +41,6 @@ export const kontrolTaskTypes = [
 // Outreach status of each contact (shown as Status on contacts and in filters)
 export const kontrolNoteStatuses = [
   { value: "not-contacted", label: "Not contacted", color: "#8a949b" },
-  { value: "not-researched", label: "Not researched", color: "#c4ccd2" },
   { value: "contacted", label: "Contacted, awaiting reply", color: "#9fd8d3" },
   { value: "in-conversation", label: "In conversation", color: "#58d8d0" },
   { value: "review-booked", label: "Review booked", color: "#2fb3a9" },

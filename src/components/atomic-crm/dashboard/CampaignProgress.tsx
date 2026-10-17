@@ -5,7 +5,7 @@ import type { Contact, Tag } from "../types";
 
 // Every tag is a campaign; outreach progress comes from the contact's Status
 // (values from kontrolNoteStatuses).
-const NOT_YET_CONTACTED = ["not-contacted", "not-researched"];
+const NOT_YET_CONTACTED = ["not-contacted"];
 const TALKING = ["in-conversation", "review-booked", "proposal-sent"];
 
 type CampaignRow = {
