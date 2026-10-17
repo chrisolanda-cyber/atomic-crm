@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  type DataProvider,
   type Identifier,
   useDataProvider,
   useEvent,
@@ -132,13 +133,12 @@ export const useImportFromJson = (): [
       sales: Record<number, Identifier>;
       companies: Record<number, Identifier>;
       contacts: Record<number, Identifier>;
-      tags: Record<string, Identifier>;
     } = {
       sales: {},
       companies: {},
       contacts: {},
-      tags: {},
     };
+    const resolveTag = createTagResolver(dataProvider);
 
     const importSale = async (
       dataToImport: JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined,
@@ -346,21 +346,7 @@ export const useImportFromJson = (): [
 
         let tagsIds: Array<Identifier> = [];
         if (dataToImport.tags && Array.isArray(dataToImport.tags)) {
-          tagsIds = await Promise.all(
-            dataToImport.tags.map(async (tag) => {
-              if (idsMaps.tags[tag]) {
-                return idsMaps.tags[tag];
-              }
-              const { data } = await dataProvider.create<Tag>("tags", {
-                data: {
-                  name: tag,
-                  color: colors[Math.floor(Math.random() * colors.length)],
-                },
-              });
-              idsMaps.tags[tag] = data.id;
-              return data.id;
-            }),
-          );
+          tagsIds = await Promise.all(dataToImport.tags.map(resolveTag));
         }
 
         const { data } = await dataProvider.create("contacts", {
@@ -685,6 +671,46 @@ export const useImportFromJson = (): [
   });
 
   return [state, importFile, reset];
+};
+
+/**
+ * Returns a function resolving a tag name to its id, reusing an existing tag
+ * with the same name or creating it. Contacts are imported in parallel, so the
+ * pending promise is memoized per name: concurrent contacts sharing a tag wait
+ * for the same lookup instead of each creating their own copy.
+ */
+export const createTagResolver = (dataProvider: DataProvider) => {
+  const cache = new Map<string, Promise<Identifier>>();
+
+  const findOrCreate = async (name: string) => {
+    const { data: existing } = await dataProvider.getList<Tag>("tags", {
+      filter: { name },
+      pagination: { page: 1, perPage: 1 },
+      sort: { field: "id", order: "ASC" },
+    });
+    if (existing.length > 0) {
+      return existing[0].id;
+    }
+    const { data } = await dataProvider.create<Tag>("tags", {
+      data: {
+        name,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      },
+    });
+    return data.id;
+  };
+
+  return (tag: string): Promise<Identifier> => {
+    const name = tag.trim();
+    let pending = cache.get(name);
+    if (!pending) {
+      pending = findOrCreate(name);
+      // Forget failures so a later contact can retry
+      pending.catch(() => cache.delete(name));
+      cache.set(name, pending);
+    }
+    return pending;
+  };
 };
 
 const TYPES = ["sales", "companies", "contacts", "notes", "tasks"] as const;
