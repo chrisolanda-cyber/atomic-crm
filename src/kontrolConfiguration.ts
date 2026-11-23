@@ -9,17 +9,16 @@ export const kontrolCurrency = "AUD";
 
 export const kontrolDealStages = [
   { value: "lead", label: "Lead" },
-  { value: "review-proposed", label: "Review proposed" },
-  { value: "review", label: "Review" },
+  { value: "upfront-discussions", label: "Upfront discussions" },
   { value: "proposal-sent", label: "Proposal sent" },
-  { value: "build-sprint", label: "Build sprint" },
+  { value: "build", label: "Build" },
   { value: "retainer", label: "Retainer" },
   { value: "on-hold", label: "On hold" },
   { value: "lost", label: "Lost" },
 ];
 
 // Stages counted as won: excluded from the open pipeline, shown as won on the chart
-export const kontrolDealPipelineStatuses = ["build-sprint", "retainer"];
+export const kontrolDealPipelineStatuses = ["build", "retainer"];
 
 export const kontrolDealCategories = [
   { value: "review", label: "Review" },
